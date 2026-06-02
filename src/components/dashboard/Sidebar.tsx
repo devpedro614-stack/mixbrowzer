@@ -35,7 +35,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         {/* Mobile close button */}
         <div className="flex items-center justify-between p-4 lg:hidden">
           <span className="text-sm font-medium text-gray-400">Menu</span>
-          <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-800">
+          <button
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-gray-800"
+            aria-label="Fechar menu"
+            title="Fechar menu"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>

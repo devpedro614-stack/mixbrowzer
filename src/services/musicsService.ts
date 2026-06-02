@@ -23,6 +23,7 @@ export const musicsService = {
           genre: formData.genre,
           rating: formData.rating,
           url: formData.url?.trim() || null,
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
       ])

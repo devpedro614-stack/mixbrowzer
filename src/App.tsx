@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext, useAuthState } from "@/hooks/useAuth";
+import { useDarkMode } from "@/hooks/useDarkMode";
 import { ToastProvider } from "@/components/ui/toast";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -10,18 +11,12 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { DashboardHome } from "@/pages/DashboardHome";
 import { MusicsPage } from "@/pages/MusicsPage";
 import { StatsPage } from "@/pages/StatsPage";
-import { useEffect } from "react";
+import { ProfilePage } from "@/pages/ProfilePage";
 import { isSupabaseConfigured } from "@/services/supabase";
 
 function AppWithAuth() {
   const authState = useAuthState();
-
-  // Apply dark mode on initial load
-  useEffect(() => {
-    const isDark = localStorage.getItem("darkMode") === "true" ||
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    if (isDark) document.documentElement.classList.add("dark");
-  }, []);
+  useDarkMode(); // Initialize dark mode globally
 
   if (!isSupabaseConfigured) {
     return (
@@ -65,6 +60,15 @@ function AppWithAuth() {
               <Route path="musics" element={<MusicsPage />} />
               <Route path="stats" element={<StatsPage />} />
             </Route>
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -25,26 +25,30 @@ export function ResetPasswordForm() {
   const [tokenValid, setTokenValid] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Handle the auth callback from the reset password email
-    const code = searchParams.get("code");
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) {
+    async function verifyRecoverySession() {
+      const hasRecoveryParams = searchParams.get("type") === "recovery" || window.location.href.includes("access_token=");
+
+      if (hasRecoveryParams) {
+        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        if (error || !data?.session) {
           setTokenValid(false);
           setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
-        } else {
-          setTokenValid(true);
+          return;
         }
-      });
-    } else {
-      // Check if user is already authenticated (via magic link)
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setTokenValid(!!session);
-        if (!session) {
-          setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
-        }
-      });
+        setTokenValid(true);
+        return;
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        setTokenValid(true);
+      } else {
+        setTokenValid(false);
+        setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
+      }
     }
+
+    verifyRecoverySession();
   }, [searchParams]);
 
   const validateForm = () => {

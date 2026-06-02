@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Music2, LogOut, User, Menu, X, Moon, Sun } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ onMenuToggle, menuOpen, darkMode, onToggleDarkMode }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [signingOut, setSigningOut] = useState(false);
 
   const displayName = user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário";
@@ -80,7 +82,7 @@ export function Header({ onMenuToggle, menuOpen, darkMode, onToggleDarkMode }: H
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="gap-2">
+          <DropdownMenuItem className="gap-2" onClick={() => navigate("/profile")}>
             <User className="w-4 h-4" /> Meu Perfil
           </DropdownMenuItem>
           <DropdownMenuSeparator />

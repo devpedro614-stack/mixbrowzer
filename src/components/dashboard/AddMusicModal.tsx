@@ -39,8 +39,12 @@ export function AddMusicModal({ open, onClose, onSuccess }: AddMusicModalProps) 
 
     if (!form.genre) errors.genre = "Selecione um gênero.";
 
-    const ratingError = validateRating(form.rating);
-    if (ratingError) errors.rating = ratingError;
+    if (Number.isNaN(form.rating)) {
+      errors.rating = "Nota inválida.";
+    } else {
+      const ratingError = validateRating(form.rating);
+      if (ratingError) errors.rating = ratingError;
+    }
 
     if (form.url) {
       const urlError = validateUrl(form.url);
@@ -53,7 +57,11 @@ export function AddMusicModal({ open, onClose, onSuccess }: AddMusicModalProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm() || !user) return;
+    if (!validateForm()) return;
+    if (!user) {
+      setError("Usuário não autenticado. Faça login novamente.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -65,7 +73,8 @@ export function AddMusicModal({ open, onClose, onSuccess }: AddMusicModalProps) 
       onClose();
     } catch (err: unknown) {
       console.error("Add music error:", err);
-      setError("Erro ao adicionar música. Tente novamente.");
+      const message = err instanceof Error ? err.message : JSON.stringify(err);
+      setError(`Erro ao adicionar música. ${message}`);
     } finally {
       setLoading(false);
     }
@@ -160,6 +169,7 @@ export function AddMusicModal({ open, onClose, onSuccess }: AddMusicModalProps) 
                 />
                 <div className="flex-1">
                   <input
+                    id="add-rating-range"
                     type="range"
                     min={0}
                     max={10}
@@ -168,6 +178,8 @@ export function AddMusicModal({ open, onClose, onSuccess }: AddMusicModalProps) 
                     onChange={(e) => { setForm(p => ({ ...p, rating: parseFloat(e.target.value) })); clearFieldError("rating"); }}
                     className="w-full accent-purple-600"
                     disabled={loading}
+                    aria-labelledby="add-rating"
+                    title="Nota"
                   />
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { profilesService } from "./profilesService";
 
 export const authService = {
   async signIn(email: string, password: string) {
@@ -18,6 +19,15 @@ export const authService = {
       },
     });
     if (error) throw error;
+
+    if (data?.session?.user?.id) {
+      try {
+        await profilesService.upsertProfile(data.session.user.id, { full_name: name });
+      } catch (profileError) {
+        console.warn("Unable to create profile row:", profileError);
+      }
+    }
+
     return data;
   },
 
