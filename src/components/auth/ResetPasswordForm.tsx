@@ -26,7 +26,10 @@ export function ResetPasswordForm() {
 
   useEffect(() => {
     async function verifyRecoverySession() {
-      const hasRecoveryParams = searchParams.get("type") === "recovery" || window.location.href.includes("access_token=");
+      const hasRecoveryParams =
+        searchParams.get("type") === "recovery" ||
+        window.location.href.includes("type=recovery") ||
+        window.location.hash.includes("access_token=");
 
       if (hasRecoveryParams) {
         const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
@@ -35,7 +38,9 @@ export function ResetPasswordForm() {
           setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
           return;
         }
+
         setTokenValid(true);
+        window.history.replaceState({}, "", window.location.pathname);
         return;
       }
 
