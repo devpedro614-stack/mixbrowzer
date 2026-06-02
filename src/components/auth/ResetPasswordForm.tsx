@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Music2, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,47 +26,35 @@ export function ResetPasswordForm() {
 
   useEffect(() => {
     async function verifyRecoverySession() {
-      try {
-        const url = window.location.href;
-        const hasRecoveryParams =
-          url.includes("type=recovery") ||
-          url.includes("access_token=");
+      const hasRecoveryParams =
+        searchParams.get("type") === "recovery" ||
+        window.location.href.includes("type=recovery") ||
+        window.location.hash.includes("access_token=");
 
-        if (hasRecoveryParams) {
-          const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
-          if (error) {
-            setTokenValid(false);
-            setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
-            return;
-          }
-
-          if (data?.session) {
-            setTokenValid(true);
-            window.history.replaceState({}, "", window.location.pathname);
-            return;
-          }
-
+      if (hasRecoveryParams) {
+        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        if (error || !data?.session) {
           setTokenValid(false);
           setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
           return;
         }
 
-        const { data } = await supabase.auth.getSession();
-        if (data?.session) {
-          setTokenValid(true);
-        } else {
-          setTokenValid(false);
-          setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
-        }
-      } catch (err) {
-        console.error("Error verifying recovery session:", err);
+        setTokenValid(true);
+        window.history.replaceState({}, "", window.location.pathname);
+        return;
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        setTokenValid(true);
+      } else {
         setTokenValid(false);
-        setError("Erro ao verificar token. Tente novamente.");
+        setError("Token expirado ou inválido. Solicite um novo link de recuperação.");
       }
     }
 
     verifyRecoverySession();
-  }, []);
+  }, [searchParams]);
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
