@@ -1,0 +1,1 @@
+﻿.env\n.env.local\nnode_modules/\ndist/\n.vite/\n*.log\n.DS_Store\n.idea/\n.vscode/\n
