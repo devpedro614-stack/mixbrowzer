@@ -23,6 +23,7 @@ grant usage on schema public to authenticated;
 
 -- Row Level Security Policies: Users can only access their own records
 drop policy if exists "Users can select their own musics" on public.musics;
+
 create policy "Users can select their own musics" on public.musics
   for select using (user_id = auth.uid()::text);
 
