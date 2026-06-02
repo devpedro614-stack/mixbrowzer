@@ -9,7 +9,8 @@ export const authService = {
   },
 
   async signUp(email: string, password: string, name: string) {
-    const redirectUrl = `${window.location.origin}/login`;
+    const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    const redirectUrl = `${baseUrl}/login`;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -37,7 +38,8 @@ export const authService = {
   },
 
   async resetPasswordForEmail(email: string) {
-    const redirectUrl = `${window.location.origin}/reset-password`;
+    const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    const redirectUrl = `${baseUrl}/reset-password`;
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
